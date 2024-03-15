@@ -1,11 +1,18 @@
 import React, { useState } from "react";
-import { TextInput, Label, Button } from "flowbite-react";
-import { Link } from "react-router-dom";
-
+import { TextInput, Label, Button, Alert } from "flowbite-react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  loginSuccess,
+  loginFailure,
+  loginStart,
+} from "../redux/user/userSlice.js";
+import { useDispatch, useSelector } from "react-redux";
 const Login = () => {
+  const { error, loading } = useSelector((state) => state.user);
   const [formData, setFormData] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   //handle Change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -14,7 +21,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setLoading(true);
+      dispatch(loginStart());
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -22,15 +29,13 @@ const Login = () => {
       });
       const data = await res.json();
       if (data.success === false) {
-        setError(data.message);
-        setLoading(false);
+        dispatch(loginFailure(data.message));
         return;
       }
-      setError(null);
-      setLoading(false);
+      dispatch(loginSuccess(data));
+      navigate("/");
     } catch (error) {
-      setError(error.message);
-      setLoading(false);
+      dispatch(loginFailure(error.message));
     }
   };
 
@@ -50,21 +55,31 @@ const Login = () => {
           </p>
         </div>
         <div className="flex-1">
-          <form className="flex flex-col gap-4">
+          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <div>
               <Label value="Your email" />
               <TextInput
                 type="email"
                 placeholder="name@company.com"
                 id="email"
+                onChange={handleChange}
               />
             </div>
             <div>
               <Label value="Your password" />
-              <TextInput type="password" placeholder="password" id="password" />
+              <TextInput
+                type="password"
+                placeholder="password"
+                id="password"
+                onChange={handleChange}
+              />
             </div>
-            <Button gradientDuoTone="purpleToPink" type="submit">
-              Log In
+            <Button
+              gradientDuoTone="purpleToPink"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? "Loading" : "Log In"}
             </Button>
           </form>
           <div className="flex items-center gap-2 text-sm mt-5">
@@ -73,6 +88,11 @@ const Login = () => {
               Sign In
             </Link>
           </div>
+          {error && (
+            <Alert className="mt-5" color="failure">
+              {error}
+            </Alert>
+          )}
         </div>
       </div>
     </div>
