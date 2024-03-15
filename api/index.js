@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import express from "express";
 import dotenv from "dotenv";
+import authRouter from "./routes/auth.route.js";
 
 dotenv.config();
 // connect mongoDb
@@ -21,6 +22,8 @@ app.use(express.json());
 app.listen(3000, () => {
   console.log("Sever is running on port 3000");
 });
+
+app.use("/api/auth", authRouter);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
