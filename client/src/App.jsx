@@ -8,6 +8,7 @@ import About from "./pages/About";
 import Products from "./pages/Products";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
+import CreateProduct from "./pages/CreateProduct";
 const App = () => {
   return (
     <Router>
@@ -21,6 +22,7 @@ const App = () => {
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>
+        <Route path="/create-product" element={<CreateProduct />} />
       </Routes>
     </Router>
   );

@@ -43,7 +43,10 @@ export const loginUser = async (req, res, next) => {
     return next(errorHandler(403, "Password not Valid"));
   }
   try {
-    const token = jwt.sign({ id: validUser._id }, process.env.SECRET_KEY);
+    const token = jwt.sign(
+      { id: validUser._id, isAdmin: validUser.isAdmin },
+      process.env.SECRET_KEY
+    );
     const { password: pass, ...userInfo } = validUser._doc;
     res.status(200).cookie("access_token", token).json(userInfo);
   } catch (error) {

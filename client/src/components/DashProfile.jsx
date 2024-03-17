@@ -213,6 +213,13 @@ const DashProfile = () => {
         <Button type="submit" gradientDuoTone="purpleToBlue" outline>
           {fileUploading || loading ? "Updating" : "Update"}
         </Button>
+        {currentUser.isAdmin ? (
+          <Button type="submit" gradientDuoTone="purpleToBlue" outline>
+            Create a Product
+          </Button>
+        ) : (
+          ""
+        )}
       </form>
       <div className="text-red-500 flex justify-between mt-5">
         <span className="cursor-pointer" onClick={handleDelete}>
