@@ -3,11 +3,31 @@ import { Button, Navbar, TextInput, Dropdown, Avatar } from "flowbite-react";
 import { Link, Outlet } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
 import { FaMoon } from "react-icons/fa";
-import { useSelector } from "react-redux";
-
+import { useDispatch, useSelector } from "react-redux";
+import {
+  deleteStart,
+  deleteSuccess,
+  deleteFailure,
+} from "../../redux/user/userSlice";
 const Header = () => {
   const { currentUser } = useSelector((state) => state.user);
-
+  const dispatch = useDispatch();
+  const handleSignout = async () => {
+    try {
+      dispatch(deleteStart());
+      const res = await fetch("/api/user/signout");
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(deleteFailure(data.message));
+        return;
+      }
+      if (res.ok) {
+        dispatch(deleteSuccess(data));
+      }
+    } catch (error) {
+      dispatch(deleteFailure(error.message));
+    }
+  };
   return (
     <>
       <Navbar>
@@ -53,11 +73,11 @@ const Header = () => {
                   {currentUser.email}
                 </span>
               </Dropdown.Header>
-              <Link to={"/dashboard"}>
+              <Link to={"/dashboard?tab=profile"}>
                 <Dropdown.Item> Profile</Dropdown.Item>
               </Link>
               <Dropdown.Divider />
-              <Dropdown.Item> Sign out</Dropdown.Item>
+              <Dropdown.Item onClick={handleSignout}> Sign out</Dropdown.Item>
             </Dropdown>
           ) : (
             <Link to="/sign-in">

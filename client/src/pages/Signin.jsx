@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { TextInput, Label, Button, Alert } from "flowbite-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 const Signin = () => {
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
   //handle Change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -27,6 +28,7 @@ const Signin = () => {
       }
       setError(null);
       setLoading(false);
+      navigate("/log-in");
     } catch (error) {
       setError(error.message);
       setLoading(false);
