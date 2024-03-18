@@ -17,12 +17,14 @@ const CreateProduct = () => {
   const [imageUploadProgress, setImageUploadProgress] = useState(0);
   const [imageUploadError, setImageUploadError] = useState(null);
   const [imageUploading, setImageUploading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [productSuccess, setProductSuccess] = useState("");
   const [formData, setFormData] = useState({
     title: "",
-    imagesUrls: [],
+    category: "",
     content: "",
     price: 0,
-    category: "",
+    imagesUrls: [],
   });
   const handleImagesChange = (e) => {
     const images = e.target.files;
@@ -87,6 +89,27 @@ const CreateProduct = () => {
       imagesUrls: formData.imagesUrls.filter((_, i) => i !== index),
     });
   };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      setProductSuccess("");
+      const res = await fetch("/api/product/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setLoading(false);
+        setProductSuccess(data);
+      }
+    } catch (error) {
+      console.log(error.message);
+      setLoading(false);
+      setProductSuccess("");
+    }
+  };
   return (
     <div className="p-3 max-w-3xl mx-auto min-h-screen">
       <h1 className="text-center text-3xl my-7 font-semibold">Create a post</h1>
@@ -126,6 +149,7 @@ const CreateProduct = () => {
             gradientDuoTone="purpleToBlue"
             size="sm"
             outline
+            disabled={imageUploading}
             onClick={handleUploadImages}
           >
             {imageUploadProgress ? (
@@ -177,9 +201,15 @@ const CreateProduct = () => {
           className="flex-1"
           onChange={(e) => setFormData({ ...formData, price: e.target.value })}
         />
-        <Button type="submit" gradientDuoTone="purpleToPink">
-          Publish
+        <Button
+          type="submit"
+          gradientDuoTone="purpleToPink"
+          onClick={handleSubmit}
+          disabled={imageUploading || loading}
+        >
+          {loading ? "Puplishing" : "Puplish"}
         </Button>
+        {productSuccess && <Alert color="success">{productSuccess}</Alert>}
       </form>
     </div>
   );

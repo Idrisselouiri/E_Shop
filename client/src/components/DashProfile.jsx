@@ -18,6 +18,7 @@ import {
   deleteFailure,
 } from "../redux/user/userSlice";
 import "react-circular-progressbar/dist/styles.css";
+import { Link } from "react-router-dom";
 const DashProfile = () => {
   const { currentUser, loading, error } = useSelector((state) => state.user);
   const [file, setFile] = useState(null);
@@ -214,9 +215,16 @@ const DashProfile = () => {
           {fileUploading || loading ? "Updating" : "Update"}
         </Button>
         {currentUser.isAdmin ? (
-          <Button type="submit" gradientDuoTone="purpleToBlue" outline>
-            Create a Product
-          </Button>
+          <Link to={"/create-product"}>
+            <Button
+              type="submit"
+              gradientDuoTone="purpleToBlue"
+              className="w-full"
+              outline
+            >
+              Create a Product
+            </Button>
+          </Link>
         ) : (
           ""
         )}

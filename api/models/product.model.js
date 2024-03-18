@@ -2,13 +2,18 @@ import mongoose from "mongoose";
 
 const ProductSchema = mongoose.Schema(
   {
-    title: {
+    userId: {
       type: String,
       required: true,
     },
-    category: {
+    title: {
       type: String,
       required: true,
+      unique: true,
+    },
+    category: {
+      type: String,
+      default: "uncategorized",
     },
     content: {
       type: String,
@@ -21,6 +26,11 @@ const ProductSchema = mongoose.Schema(
     imagesUrls: {
       type: Array,
       required: true,
+    },
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
     },
   },
   { timestamps: true }
