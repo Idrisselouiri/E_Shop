@@ -16,7 +16,7 @@ export const createProduct = async (req, res, next) => {
   try {
     const newProduct = new Product({ ...req.body, slug, userId: req.user.id });
     await newProduct.save();
-    res.status(200).json("product has been created");
+    res.status(200).json(newProduct);
   } catch (error) {
     next(error);
   }
@@ -32,7 +32,7 @@ export const getProducts = async (req, res, next) => {
       ...(req.query.userId && { userId: req.query.userId }),
       ...(req.query.category && { category: req.query.category }),
       ...(req.query.slug && { slug: req.query.slug }),
-      ...(req.query.postId && { postId: req.query.postId }),
+      ...(req.query.productId && { _id: req.query.productId }),
       ...(req.query.searchTerm && {
         $or: [
           { title: { $regex: req.query.searchTerm, $option: "i" } },
@@ -66,9 +66,36 @@ export const deleteProduct = async (req, res, next) => {
       errorHandler(404, "You are not allowed to delete this product")
     );
   }
+
   try {
     await Product.findByIdAndDelete(req.params.productId);
     res.status(200).json("Product has been deleted");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateProduct = async (req, res, next) => {
+  if (req.user.id !== req.body.userId && !req.user.isAdmin) {
+    return next(
+      errorHandler(403, "You can not allowed to update this product")
+    );
+  }
+  try {
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.productId,
+      {
+        $set: {
+          title: req.body.title,
+          category: req.body.category,
+          content: req.body.content,
+          price: req.body.price,
+          imagesUrls: req.body.imagesUrls,
+        },
+      },
+      { new: true }
+    );
+    res.status(200).json(updatedProduct);
   } catch (error) {
     next(error);
   }

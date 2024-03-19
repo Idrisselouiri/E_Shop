@@ -9,6 +9,7 @@ import Products from "./pages/Products";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import CreateProduct from "./pages/CreateProduct";
+import UpdateProduct from "./pages/UpdateProduct";
 const App = () => {
   return (
     <Router>
@@ -23,6 +24,7 @@ const App = () => {
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>
         <Route path="/create-product" element={<CreateProduct />} />
+        <Route path="/update-product/:productId" element={<UpdateProduct />} />
       </Routes>
     </Router>
   );

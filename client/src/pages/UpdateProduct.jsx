@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, FileInput, Select, TextInput, Alert } from "flowbite-react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -11,14 +11,17 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import { app } from "../firebase";
+import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-const CreateProduct = () => {
+const UpdateProduct = () => {
+  const { currentUser } = useSelector((state) => state.user);
   const [images, setImages] = useState([]);
   const [imageUploadProgress, setImageUploadProgress] = useState(0);
   const [imageUploadError, setImageUploadError] = useState(null);
   const [imageUploading, setImageUploading] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [productSuccess, setProductSuccess] = useState("");
+  const [updatedSuccess, setUpdatedSuccess] = useState("");
   const [formData, setFormData] = useState({
     title: "",
     category: "",
@@ -26,6 +29,27 @@ const CreateProduct = () => {
     price: 0,
     imagesUrls: [],
   });
+  const params = useParams();
+
+  useEffect(() => {
+    const getProduct = async () => {
+      try {
+        const res = await fetch(
+          `/api/product/getProducts?productId=${params.productId}`
+        );
+        const data = await res.json();
+        if (data.success === false) {
+          console.log(data.message);
+        }
+        if (res.ok) {
+          setFormData(data.products[0]);
+        }
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+    getProduct();
+  }, [params.productId]);
   const handleImagesChange = (e) => {
     const images = e.target.files;
     if (images) {
@@ -93,26 +117,29 @@ const CreateProduct = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      setProductSuccess("");
-      const res = await fetch("/api/product/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      setUpdatedSuccess("");
+      const res = await fetch(
+        `/api/product/update/${formData._id}/${currentUser._id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
       const data = await res.json();
       if (res.ok) {
         setLoading(false);
-        setProductSuccess("procut has been created");
+        setUpdatedSuccess("product has been updated");
       }
     } catch (error) {
       console.log(error.message);
       setLoading(false);
-      setProductSuccess("");
+      setUpdatedSuccess("");
     }
   };
   return (
     <div className="p-3 max-w-3xl mx-auto min-h-screen">
-      <h1 className="text-center text-3xl my-7 font-semibold">Create a post</h1>
+      <h1 className="text-center text-3xl my-7 font-semibold">Update a post</h1>
       <form className="flex flex-col gap-4">
         <div className="flex flex-col gap-4 sm:flex-row justify-between">
           <TextInput
@@ -124,11 +151,13 @@ const CreateProduct = () => {
             onChange={(e) =>
               setFormData({ ...formData, title: e.target.value })
             }
+            value={formData.title}
           />
           <Select
             onChange={(e) =>
               setFormData({ ...formData, category: e.target.value })
             }
+            value={formData.category}
           >
             <option value="uncategorized">Select a category</option>
             <option value="javascript">JavaScript</option>
@@ -192,6 +221,7 @@ const CreateProduct = () => {
           required
           id="description"
           onChange={(value) => setFormData({ ...formData, content: value })}
+          value={formData.content}
         />
         <TextInput
           type="number"
@@ -199,6 +229,7 @@ const CreateProduct = () => {
           required
           id="price"
           className="flex-1"
+          value={formData.price}
           onChange={(e) => setFormData({ ...formData, price: e.target.value })}
         />
         <Button
@@ -209,10 +240,10 @@ const CreateProduct = () => {
         >
           {loading ? "Puplishing" : "Puplish"}
         </Button>
-        {productSuccess && <Alert color="success">{productSuccess}</Alert>}
+        {updatedSuccess && <Alert color="success">{updatedSuccess}</Alert>}
       </form>
     </div>
   );
 };
 
-export default CreateProduct;
+export default UpdateProduct;

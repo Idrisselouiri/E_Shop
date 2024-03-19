@@ -96,7 +96,7 @@ const DashProducts = () => {
                   </Table.Cell>
                   <Table.Cell>
                     <Link
-                      to={`/update-post/${product._id}`}
+                      to={`/update-product/${product._id}`}
                       className="text-teal-500 hover:underline"
                     >
                       <span>Edit</span>
