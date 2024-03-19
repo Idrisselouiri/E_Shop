@@ -9,6 +9,7 @@ import {
   HiTable,
   HiUser,
   HiViewBoards,
+  HiDocumentText,
 } from "react-icons/hi";
 const DashSidebar = () => {
   const location = useLocation();
@@ -28,6 +29,11 @@ const DashSidebar = () => {
           <Link to={"/dashboard?tab=profile"}>
             <Sidebar.Item href="#" icon={HiUser}>
               Profile
+            </Sidebar.Item>
+          </Link>
+          <Link to={"/dashboard?tab=products"}>
+            <Sidebar.Item href="#" icon={HiDocumentText}>
+              Products
             </Sidebar.Item>
           </Link>
           <Sidebar.Item href="#" icon={HiArrowSmRight}>
